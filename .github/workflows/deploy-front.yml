@@ -24,6 +24,11 @@ jobs:
       - name: Build Angular app
         run: npm run build:prod
 
+      - name: Move files in docs/browser to docs folder
+        run: |
+          mv docs/browser/* docs
+          rm -rf docs/browser
+
       - name: Add 404.html for Angular routing
         run: cp dist/project-management-tool-front/browser/index.html dist/project-management-tool-front/browser/404.html
 
