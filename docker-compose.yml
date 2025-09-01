@@ -1,0 +1,20 @@
+services:
+  # Frontend Angular avec Nginx
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: project-management-tool-front
+    ports:
+      - "4200:80"
+    environment:
+      - API_URL=http://localhost:8080
+      - NODE_ENV=production
+    networks:
+      - default
+    restart: unless-stopped
+
+networks:
+  default:
+    name: project-management-tool-back_app-network
+    external: true

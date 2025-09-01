@@ -40,3 +40,8 @@ testem.log
 # System files
 .DS_Store
 Thumbs.db
+.vscode
+
+# Environment files
+.env
+environment.production.ts

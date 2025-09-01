@@ -1,13 +1,18 @@
 {
-  "name": "project-management-tool",
+  "name": "project-management-tool-front",
   "version": "0.0.0",
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
+    "dev": "ng serve --configuration development",
     "build": "ng build",
+    "build:prod": "ng build --configuration production",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "serve:ssr:project-management-tool": "node dist/project-management-tool/server/server.mjs"
+    "serve:ssr:project-management-tool-front": "node dist/project-management-tool-front/server/server.mjs"
   },
   "private": true,
   "dependencies": {
