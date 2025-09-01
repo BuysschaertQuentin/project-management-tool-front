@@ -22,7 +22,7 @@ jobs:
         run: npm ci
 
       - name: Build Angular app
-        run: npm run build -- --configuration production --base-href /project-management-tool/
+        run: npm run build:prod
 
       - name: Add 404.html for Angular routing
         run: cp dist/project-management-tool-front/browser/index.html dist/project-management-tool-front/browser/404.html
