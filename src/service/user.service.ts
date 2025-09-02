@@ -7,16 +7,15 @@ import { User } from '../models/user.models';
   providedIn: 'root'
 })
 export class UserService {
-  private apiUrl = '/api/users'; 
+  private apiUrl = 'https://project-management-tool-back.onrender.com/'; 
 
   constructor(private http: HttpClient) { }
 
   getUsers(): Observable<User[]> {
-    return this.http.get<User[]>(this.apiUrl);
+    return this.http.get<User[]>(`${this.apiUrl}api/users`);
   }
 
   getUser(id: number): Observable<User> {
     return this.http.get<User>(`${this.apiUrl}/${id}`);
   }
-
 }
