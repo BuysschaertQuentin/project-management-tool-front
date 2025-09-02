@@ -1,5 +1,5 @@
 import { Component, signal } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Router, RouterOutlet } from '@angular/router';
 import { User } from '../models/user.models';
 import { UserService } from '../service/user.service';
 
@@ -12,7 +12,8 @@ import { UserService } from '../service/user.service';
 export class AppComponent {
   public usersList = signal<User[]>([]);
   constructor(
-    private readonly userService : UserService
+    private readonly userService: UserService,
+    private readonly router: Router
   ) {}
 
   public testApi() {
@@ -26,4 +27,8 @@ export class AppComponent {
       }
     });
   }
+
+  public navigateToAnotherPage() {
+    this.router.navigate(['/another-page']);
+  } 
 }
