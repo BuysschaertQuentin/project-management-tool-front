@@ -7,15 +7,16 @@ import { User } from '../models/user.models';
   providedIn: 'root'
 })
 export class UserService {
-  private apiUrl = 'https://project-management-tool-back.onrender.com/'; 
+  private apiUrl = 'https://project-management-tool-back.onrender.com/api'; 
 
   constructor(private http: HttpClient) { }
 
   getUsers(): Observable<User[]> {
-    return this.http.get<User[]>(`${this.apiUrl}api/users`);
+    return this.http.get<User[]>(`${this.apiUrl}/users`);
   }
 
   getUser(id: number): Observable<User> {
-    return this.http.get<User>(`${this.apiUrl}/${id}`);
+    // URL correcte avec un seul slash
+    return this.http.get<User>(`${this.apiUrl}/users/${id}`);
   }
 }
