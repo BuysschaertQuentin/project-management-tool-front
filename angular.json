@@ -54,7 +54,9 @@
               "optimization": true,
               "extractLicenses": true,
               "sourceMap": false,
-              "namedChunks": false
+              "namedChunks": false,
+              "baseHref": "/project-management-tool-front/",
+              "deployUrl": "/project-management-tool-front/"
             },
             "development": {
               "optimization": false,
@@ -102,7 +104,12 @@
           }
         },
         "deploy": {
-          "builder": "angular-cli-ghpages:deploy"
+          "builder": "angular-cli-ghpages:deploy",
+          "options": {
+            "dir": "dist/project-management-tool-front/browser",
+            "repo": "https://github.com/BuysschaertQuentin/project-management-tool-front.git",
+            "branch": "gh-pages"
+          }
         }
       }
     }
