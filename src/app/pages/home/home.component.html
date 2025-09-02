@@ -1,0 +1,14 @@
+@let users = usersList();
+
+<div class="container">
+  <h1>Test API</h1>
+  <button class="button" (click)="testApi()">Test API</button>
+  @if (users !== null) {
+  <ul>
+    @for (user of users; track $index) {
+    <li>{{ user.name }}</li>
+    }
+  </ul>
+}
+<button class="button" (click)="navigateToAnotherPage()">Another-page</button>
+</div>
