@@ -1,18 +1,17 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-another-page',
+  standalone: true,
   imports: [],
   templateUrl: './another-page.component.html',
   styleUrl: './another-page.component.scss'
 })
 export class AnotherPageComponent {
-  constructor(
-    private router: Router
-  ) {}
+  private router = inject(Router);
 
-  public navigateToHome(): void {
+  navigateToHome(): void {
     this.router.navigate(['/home']);
   }
 }
