@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable, inject } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Injectable, inject, signal } from '@angular/core';
+import { Observable, tap } from 'rxjs';
 import { API_URL } from '../constants';
 import { Task, TaskCreateRequest, TaskUpdateRequest } from '../models/task.model';
 
@@ -9,6 +9,15 @@ import { Task, TaskCreateRequest, TaskUpdateRequest } from '../models/task.model
 })
 export class TaskService {
   private http = inject(HttpClient);
+
+  // Signal to cache user's tasks
+  userTasks = signal<Task[]>([]);
+
+  getUserTasks(userId: number): Observable<Task[]> {
+    return this.http.get<Task[]>(`${API_URL}/users/${userId}/tasks`).pipe(
+      tap(tasks => this.userTasks.set(tasks))
+    );
+  }
 
   createTask(projectId: number, task: TaskCreateRequest): Observable<Task> {
     return this.http.post<Task>(`${API_URL}/projects/${projectId}/tasks`, task);

@@ -1,43 +1,73 @@
 import { Routes } from '@angular/router';
-import { AnotherPageComponent } from './pages/another-page/another-page.component';
 import { ErrorPageComponent } from './pages/error-page/error-page.component';
-import { HomeComponent } from './pages/home/home.component';
 import { LoginComponent } from './pages/auth/login/login.component';
 import { RegisterComponent } from './pages/auth/register/register.component';
 import { authGuard } from './core/guards/auth.guard';
 import { MainLayoutComponent } from './layout/main-layout/main-layout.component';
+import { DashboardComponent } from './pages/dashboard/dashboard.component';
 
 export const routes: Routes = [
-  {
-    path: '',
-    pathMatch: 'full',
-    redirectTo: 'home'
-  },
-  {
-    path: 'home',
-    component: HomeComponent,
-    title: 'Accueil'
-  },
+  // Public Routes (Auth)
   {
     path: 'login',
     component: LoginComponent,
-    title: 'Connexion'
+    title: 'Connexion - PMT'
   },
   {
     path: 'register',
     component: RegisterComponent,
-    title: 'Inscription'
+    title: 'Inscription - PMT'
+  },
+
+  // Protected Routes (App Shell with Layout)
+  {
+    path: 'app',
+    component: MainLayoutComponent,
+    canActivate: [authGuard],
+    children: [
+      {
+        path: '',
+        redirectTo: 'dashboard',
+        pathMatch: 'full'
+      },
+      {
+        path: 'dashboard',
+        component: DashboardComponent,
+        title: 'Tableau de bord - PMT'
+      },
+      {
+        path: 'projects',
+        loadComponent: () => import('./pages/dashboard/dashboard.component').then(m => m.DashboardComponent), // Placeholder
+        title: 'Projets - PMT'
+      },
+      {
+        path: 'tasks',
+        loadComponent: () => import('./pages/dashboard/dashboard.component').then(m => m.DashboardComponent), // Placeholder
+        title: 'Mes Tâches - PMT'
+      },
+      {
+        path: 'team',
+        loadComponent: () => import('./pages/dashboard/dashboard.component').then(m => m.DashboardComponent), // Placeholder
+        title: 'Équipe - PMT'
+      }
+    ]
+  },
+
+  // Fallback and Root
+  {
+    path: '',
+    redirectTo: 'app/dashboard',
+    pathMatch: 'full'
   },
   {
-    path: 'another-page',
-    component: AnotherPageComponent,
-    title: 'Autre page (Protégée)',
-    canActivate: [authGuard]
+    path: 'home',
+    redirectTo: 'app/dashboard',
+    pathMatch: 'full'
   },
   {
     path: 'error',
     component: ErrorPageComponent,
-    title: 'Erreur'
+    title: 'Erreur - PMT'
   },
   {
     path: '**',

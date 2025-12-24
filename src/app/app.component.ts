@@ -1,20 +1,10 @@
-import { Component, inject } from '@angular/core';
-import { Router, RouterLink, RouterOutlet } from '@angular/router';
-import { AuthService } from './core/services/auth.service';
+import { Component } from '@angular/core';
+import { RouterOutlet } from '@angular/router';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, RouterLink],
-  templateUrl: './app.component.html',
-  styleUrl: './app.component.scss'
+  imports: [RouterOutlet],
+  template: '<router-outlet />'
 })
-export class AppComponent {
-  authService = inject(AuthService);
-  private router = inject(Router);
-
-  logout() {
-    this.authService.logout();
-    this.router.navigate(['/login']);
-  }
-}
+export class AppComponent {}

@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable, inject } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Injectable, inject, signal } from '@angular/core';
+import { Observable, tap } from 'rxjs';
 import { API_URL } from '../constants';
 import { Project, ProjectCreateRequest } from '../models/project.model';
 import { UserResponse } from '../models/auth.model';
@@ -11,6 +11,15 @@ import { UserResponse } from '../models/auth.model';
 export class ProjectService {
   private http = inject(HttpClient);
   private readonly apiUrl = `${API_URL}/projects`;
+
+  // Signal to cache user's projects
+  userProjects = signal<Project[]>([]);
+
+  getUserProjects(userId: number): Observable<Project[]> {
+    return this.http.get<Project[]>(`${API_URL}/users/${userId}/projects`).pipe(
+      tap(projects => this.userProjects.set(projects))
+    );
+  }
 
   createProject(project: ProjectCreateRequest): Observable<Project> {
     return this.http.post<Project>(this.apiUrl, project);
