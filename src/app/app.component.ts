@@ -1,34 +1,10 @@
-import { Component, signal } from '@angular/core';
-import { Router, RouterOutlet } from '@angular/router';
-import { User } from '../models/user.models';
-import { UserService } from '../service/user.service';
+import { Component } from '@angular/core';
+import { RouterOutlet } from '@angular/router';
 
 @Component({
   selector: 'app-root',
+  standalone: true,
   imports: [RouterOutlet],
-  templateUrl: './app.component.html',
-  styleUrl: './app.component.scss'
+  template: '<router-outlet />'
 })
-export class AppComponent {
-  public usersList = signal<User[]>([]);
-  constructor(
-    private readonly userService: UserService,
-    private readonly router: Router
-  ) {}
-
-  public testApi() {
-    this.userService.getUsers().subscribe({
-      next: (users: User[]) => {
-        this.usersList.set(users);
-        console.log(users);
-      },
-      error: (err) => {
-        console.error('Error fetching users:', err);
-      }
-    });
-  }
-
-  public navigateToAnotherPage() {
-    this.router.navigate(['/another-page']);
-  } 
-}
+export class AppComponent {}
