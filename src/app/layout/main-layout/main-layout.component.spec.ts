@@ -2,25 +2,29 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { MainLayoutComponent } from './main-layout.component';
+import { AuthService } from '../../core/services/auth.service';
 
-import { ErrorPageComponent } from './error-page.component';
+describe('MainLayoutComponent', () => {
+  let component: MainLayoutComponent;
+  let fixture: ComponentFixture<MainLayoutComponent>;
 
-describe('ErrorPageComponent', () => {
-  let component: ErrorPageComponent;
-  let fixture: ComponentFixture<ErrorPageComponent>;
+  const mockUser = { id: 1, username: 'testuser', email: 'test@test.com' };
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ErrorPageComponent],
+      imports: [MainLayoutComponent],
       providers: [
         provideRouter([]),
         provideHttpClient(),
         provideHttpClientTesting()
       ]
-    })
-    .compileComponents();
+    }).compileComponents();
 
-    fixture = TestBed.createComponent(ErrorPageComponent);
+    const authService = TestBed.inject(AuthService);
+    authService.currentUser.set(mockUser as any);
+
+    fixture = TestBed.createComponent(MainLayoutComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

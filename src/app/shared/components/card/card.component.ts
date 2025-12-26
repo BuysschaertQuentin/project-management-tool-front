@@ -6,12 +6,12 @@ import { Component, input } from '@angular/core';
   template: `
     <div [class]="getCardClasses()">
       @if (title()) {
-        <div class="p-6 border-b border-gray-100 flex items-center justify-between">
+        <div class="card-header p-6 border-b border-gray-100 flex items-center justify-between">
           <h3 class="font-semibold text-gray-900">{{ title() }}</h3>
           <ng-content select="[card-actions]"></ng-content>
         </div>
       }
-      <div [class]="padding() ? 'p-6' : ''">
+      <div class="card-body" [class]="padding() ? 'p-6' : ''">
         <ng-content></ng-content>
       </div>
     </div>
