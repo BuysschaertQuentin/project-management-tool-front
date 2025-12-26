@@ -48,13 +48,18 @@ export const routes: Routes = [
       },
       {
         path: 'tasks',
-        loadComponent: () => import('./pages/dashboard/dashboard.component').then(m => m.DashboardComponent), // Placeholder
+        loadComponent: () => import('./pages/tasks/tasks.component').then(m => m.TasksComponent),
         title: 'Mes Tâches - PMT'
       },
       {
         path: 'team',
-        loadComponent: () => import('./pages/dashboard/dashboard.component').then(m => m.DashboardComponent), // Placeholder
+        loadComponent: () => import('./pages/team/team.component').then(m => m.TeamComponent),
         title: 'Équipe - PMT'
+      },
+      {
+        path: 'notifications',
+        loadComponent: () => import('./pages/notifications/notifications.component').then(m => m.NotificationsComponent),
+        title: 'Notifications - PMT'
       }
     ]
   },

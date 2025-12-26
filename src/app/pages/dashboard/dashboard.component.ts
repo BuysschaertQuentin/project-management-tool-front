@@ -1,26 +1,25 @@
 import { Component, inject, signal, computed, OnInit } from '@angular/core';
+import { Router, RouterLink } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { AuthService } from '../../core/services/auth.service';
 import { ProjectService } from '../../core/services/project.service';
 import { TaskService } from '../../core/services/task.service';
 import { Project } from '../../core/models/project.model';
-import { Task, TaskStatus } from '../../core/models/task.model';
+import { Task } from '../../core/models/task.model';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [DatePipe],
+  imports: [DatePipe, RouterLink],
   templateUrl: './dashboard.component.html'
 })
 export class DashboardComponent implements OnInit {
   private authService = inject(AuthService);
   private projectService = inject(ProjectService);
   private taskService = inject(TaskService);
+  private router = inject(Router);
 
-  // User info
   currentUser = this.authService.currentUser;
-
-  // Data signals
   projects = signal<Project[]>([]);
   tasks = signal<Task[]>([]);
   isLoading = signal(true);
@@ -32,29 +31,33 @@ export class DashboardComponent implements OnInit {
       label: 'Projets actifs',
       value: this.projects().length,
       icon: 'folder',
-      color: 'blue'
+      color: 'blue',
+      route: '/app/projects'
     },
     {
       label: 'Tâches en cours',
-      value: this.tasks().filter(t => t.status === TaskStatus.IN_PROGRESS).length,
+      value: this.tasks().filter(t => t.status === 'IN_PROGRESS').length,
       icon: 'tasks',
-      color: 'yellow'
+      color: 'yellow',
+      route: '/app/tasks'
     },
     {
       label: 'Tâches terminées',
-      value: this.tasks().filter(t => t.status === TaskStatus.DONE).length,
+      value: this.tasks().filter(t => t.status === 'DONE').length,
       icon: 'check',
-      color: 'green'
+      color: 'green',
+      route: '/app/tasks'
     },
     {
       label: 'À faire',
-      value: this.tasks().filter(t => t.status === TaskStatus.TODO).length,
+      value: this.tasks().filter(t => t.status === 'TODO').length,
       icon: 'todo',
-      color: 'purple'
+      color: 'purple',
+      route: '/app/tasks'
     },
   ]);
 
-  // Recent tasks (last 5)
+  // Recent tasks assigned to current user (last 5)
   recentTasks = computed(() =>
     this.tasks()
       .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
@@ -81,7 +84,7 @@ export class DashboardComponent implements OnInit {
       }
     });
 
-    // Load tasks
+    // Load tasks assigned to user
     this.taskService.getUserTasks(userId).subscribe({
       next: (tasks) => {
         this.tasks.set(tasks);
@@ -93,5 +96,21 @@ export class DashboardComponent implements OnInit {
         this.isLoading.set(false);
       }
     });
+  }
+
+  goToProject(projectId: number) {
+    this.router.navigate(['/app/projects', projectId]);
+  }
+
+  navigateTo(route: string) {
+    this.router.navigate([route]);
+  }
+
+  getPriorityClass(priority: string): string {
+    switch (priority) {
+      case 'HIGH': return 'bg-red-100 text-red-700';
+      case 'MEDIUM': return 'bg-yellow-100 text-yellow-700';
+      default: return 'bg-gray-100 text-gray-700';
+    }
   }
 }

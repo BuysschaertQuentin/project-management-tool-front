@@ -10,19 +10,15 @@
   <!-- Right: Actions & Profile -->
   <div class="flex items-center gap-4">
 
-    <!-- Quick Action -->
-    <button class="hidden md:flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all shadow-sm hover:-translate-y-0.5">
-      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
-      Nouveau Projet
-    </button>
-
-    <div class="w-px h-6 bg-gray-200"></div>
-
     <!-- Notifications -->
-    <button class="relative p-2 text-gray-400 hover:text-gray-600 transition-colors rounded-full hover:bg-gray-100">
+    <a routerLink="/app/notifications" class="relative p-2 text-gray-400 hover:text-gray-600 transition-colors rounded-full hover:bg-gray-100">
       <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
-      <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
-    </button>
+      @if (unreadCount() > 0) {
+        <span class="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] bg-red-500 rounded-full text-white text-xs font-medium flex items-center justify-center px-1">
+          {{ unreadCount() > 99 ? '99+' : unreadCount() }}
+        </span>
+      }
+    </a>
 
     <!-- User Profile -->
     @if (authService.currentUser(); as user) {

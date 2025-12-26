@@ -3,15 +3,16 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { DatePipe } from '@angular/common';
 import { AuthService } from '../../core/services/auth.service';
-import { ProjectService } from '../../core/services/project.service';
+import { ProjectService, ProjectMember } from '../../core/services/project.service';
 import { TaskService } from '../../core/services/task.service';
 import { Project } from '../../core/models/project.model';
 import { Task, TaskStatus, TaskPriority } from '../../core/models/task.model';
+import { ConfirmModalComponent } from '../../shared/components';
 
 @Component({
   selector: 'app-project-detail',
   standalone: true,
-  imports: [ReactiveFormsModule, DatePipe],
+  imports: [ReactiveFormsModule, DatePipe, ConfirmModalComponent],
   templateUrl: './project-detail.component.html'
 })
 export class ProjectDetailComponent implements OnInit {
@@ -25,13 +26,18 @@ export class ProjectDetailComponent implements OnInit {
   currentUser = this.authService.currentUser;
   project = signal<Project | null>(null);
   tasks = signal<Task[]>([]);
+  members = signal<ProjectMember[]>([]);
   isLoading = signal(true);
   error = signal<string | null>(null);
 
-  // Modal state
+  // Create modal state
   showCreateModal = signal(false);
   isCreating = signal(false);
   createError = signal<string | null>(null);
+
+  // Delete confirm modal state
+  showDeleteModal = signal(false);
+  taskToDelete = signal<Task | null>(null);
 
   // Kanban columns
   columns = [
@@ -50,7 +56,8 @@ export class ProjectDetailComponent implements OnInit {
     name: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(200)]],
     description: ['', [Validators.maxLength(2000)]],
     dueDate: ['', [Validators.required]],
-    priority: [TaskPriority.MEDIUM, [Validators.required]]
+    priority: [TaskPriority.MEDIUM, [Validators.required]],
+    assignedToUserId: [null as number | null]
   });
 
   // Computed tasks by status
@@ -67,6 +74,7 @@ export class ProjectDetailComponent implements OnInit {
     if (projectId) {
       this.loadProject(projectId);
       this.loadTasks(projectId);
+      this.loadMembers(projectId);
     }
   }
 
@@ -94,9 +102,16 @@ export class ProjectDetailComponent implements OnInit {
     });
   }
 
+  loadMembers(projectId: number) {
+    this.projectService.getProjectMembers(projectId).subscribe({
+      next: (members) => this.members.set(members),
+      error: (err) => console.error('Error loading members:', err)
+    });
+  }
+
   openCreateModal() {
     this.showCreateModal.set(true);
-    this.taskForm.reset({ priority: TaskPriority.MEDIUM });
+    this.taskForm.reset({ priority: TaskPriority.MEDIUM, assignedToUserId: null });
     this.createError.set(null);
   }
 
@@ -113,14 +128,15 @@ export class ProjectDetailComponent implements OnInit {
     this.isCreating.set(true);
     this.createError.set(null);
 
-    const { name, description, dueDate, priority } = this.taskForm.value;
+    const { name, description, dueDate, priority, assignedToUserId } = this.taskForm.value;
 
     this.taskService.createTask(this.project()!.id, {
       name: name!,
       description: description || '',
       dueDate: dueDate!,
       priority: priority!,
-      createdByUserId: userId
+      createdByUserId: userId,
+      assignedToUserId: assignedToUserId || undefined
     }).subscribe({
       next: (task) => {
         this.tasks.update(list => [...list, task]);
@@ -156,5 +172,33 @@ export class ProjectDetailComponent implements OnInit {
       case 'MEDIUM': return 'bg-yellow-100 text-yellow-700';
       default: return 'bg-gray-100 text-gray-700';
     }
+  }
+
+  // Delete task with confirmation modal
+  openDeleteModal(event: Event, task: Task) {
+    event.stopPropagation();
+    this.taskToDelete.set(task);
+    this.showDeleteModal.set(true);
+  }
+
+  closeDeleteModal() {
+    this.showDeleteModal.set(false);
+    this.taskToDelete.set(null);
+  }
+
+  confirmDeleteTask() {
+    const task = this.taskToDelete();
+    if (!task) return;
+
+    this.taskService.deleteTask(task.id).subscribe({
+      next: () => {
+        this.tasks.update(list => list.filter(t => t.id !== task.id));
+        this.closeDeleteModal();
+      },
+      error: () => {
+        this.error.set('Erreur lors de la suppression de la tâche');
+        this.closeDeleteModal();
+      }
+    });
   }
 }

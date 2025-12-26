@@ -4,18 +4,39 @@ import { Router } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { AuthService } from '../../core/services/auth.service';
 import { ProjectService } from '../../core/services/project.service';
+import { ErrorService } from '../../core/services/error.service';
 import { Project } from '../../core/models/project.model';
+import {
+  LoadingSpinnerComponent,
+  AlertComponent,
+  EmptyStateComponent,
+  PageHeaderComponent,
+  ButtonComponent,
+  ModalComponent,
+  ConfirmModalComponent
+} from '../../shared/components';
 
 @Component({
   selector: 'app-projects',
   standalone: true,
-  imports: [ReactiveFormsModule, DatePipe],
+  imports: [
+    ReactiveFormsModule,
+    DatePipe,
+    LoadingSpinnerComponent,
+    AlertComponent,
+    EmptyStateComponent,
+    PageHeaderComponent,
+    ButtonComponent,
+    ModalComponent,
+    ConfirmModalComponent
+  ],
   templateUrl: './projects.component.html'
 })
 export class ProjectsComponent implements OnInit {
   private fb = inject(FormBuilder);
   private authService = inject(AuthService);
   private projectService = inject(ProjectService);
+  private errorService = inject(ErrorService);
   private router = inject(Router);
 
   currentUser = this.authService.currentUser;
@@ -23,10 +44,14 @@ export class ProjectsComponent implements OnInit {
   isLoading = signal(true);
   error = signal<string | null>(null);
 
-  // Modal state
+  // Create modal state
   showCreateModal = signal(false);
   isCreating = signal(false);
   createError = signal<string | null>(null);
+
+  // Delete confirm modal state
+  showDeleteModal = signal(false);
+  projectToDelete = signal<Project | null>(null);
 
   projectForm = this.fb.group({
     name: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(100)]],
@@ -52,7 +77,7 @@ export class ProjectsComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error loading projects:', err);
-        this.error.set('Erreur lors du chargement des projets');
+        this.error.set(this.errorService.getErrorMessage(err));
         this.isLoading.set(false);
       }
     });
@@ -92,7 +117,7 @@ export class ProjectsComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error creating project:', err);
-        this.createError.set('Erreur lors de la création du projet');
+        this.createError.set(this.errorService.getErrorMessage(err));
         this.isCreating.set(false);
       }
     });
@@ -100,5 +125,33 @@ export class ProjectsComponent implements OnInit {
 
   goToProject(projectId: number) {
     this.router.navigate(['/app/projects', projectId]);
+  }
+
+  // Delete project with confirmation modal
+  openDeleteModal(event: Event, project: Project) {
+    event.stopPropagation();
+    this.projectToDelete.set(project);
+    this.showDeleteModal.set(true);
+  }
+
+  closeDeleteModal() {
+    this.showDeleteModal.set(false);
+    this.projectToDelete.set(null);
+  }
+
+  confirmDeleteProject() {
+    const project = this.projectToDelete();
+    if (!project) return;
+
+    this.projectService.deleteProject(project.id).subscribe({
+      next: () => {
+        this.projects.update(list => list.filter(p => p.id !== project.id));
+        this.closeDeleteModal();
+      },
+      error: (err) => {
+        this.error.set(this.errorService.getErrorMessage(err));
+        this.closeDeleteModal();
+      }
+    });
   }
 }

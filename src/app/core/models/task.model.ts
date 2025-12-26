@@ -34,6 +34,7 @@ export interface TaskCreateRequest {
   priority: string;
   dueDate: string;
   createdByUserId: number;
+  assignedToUserId?: number;
 }
 
 export interface TaskUpdateRequest {

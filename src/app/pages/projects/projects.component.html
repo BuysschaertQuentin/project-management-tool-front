@@ -1,44 +1,35 @@
 <div class="space-y-6">
-  <!-- Header -->
-  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-    <div>
-      <h1 class="text-2xl font-bold text-gray-900">Mes Projets</h1>
-      <p class="text-gray-500 mt-1">Gérez et suivez tous vos projets</p>
-    </div>
-    <button (click)="openCreateModal()"
-            class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-lg font-medium transition-all hover:-translate-y-0.5 shadow-sm">
+  <!-- Header avec composant réutilisable -->
+  <app-page-header title="Mes Projets" subtitle="Gérez et suivez tous vos projets">
+    <app-button (click)="openCreateModal()">
       <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
       Nouveau Projet
-    </button>
-  </div>
+    </app-button>
+  </app-page-header>
 
-  <!-- Error Message -->
+  <!-- Error Message avec composant réutilisable -->
   @if (error()) {
-    <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl">
-      {{ error() }}
-    </div>
+    <app-alert
+      type="error"
+      [message]="error()!"
+      [dismissible]="true"
+      (dismissed)="error.set(null)">
+    </app-alert>
   }
 
-  <!-- Loading State -->
+  <!-- Loading State avec composant réutilisable -->
   @if (isLoading()) {
-    <div class="flex items-center justify-center py-12">
-      <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-      <span class="ml-3 text-gray-600">Chargement...</span>
-    </div>
+    <app-loading-spinner message="Chargement des projets..."></app-loading-spinner>
   } @else {
-    <!-- Empty State -->
+    <!-- Empty State avec composant réutilisable -->
     @if (projects().length === 0) {
-      <div class="bg-white rounded-2xl p-12 text-center border border-gray-100 shadow-sm">
-        <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg>
-        </div>
-        <h3 class="text-lg font-semibold text-gray-900 mb-2">Aucun projet</h3>
-        <p class="text-gray-500 mb-6">Créez votre premier projet pour commencer</p>
-        <button (click)="openCreateModal()"
-                class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-lg font-medium transition-all">
-          Créer un projet
-        </button>
-      </div>
+      <app-empty-state
+        title="Aucun projet"
+        message="Créez votre premier projet pour commencer"
+        actionLabel="Créer un projet"
+        (action)="openCreateModal()">
+        <svg icon xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg>
+      </app-empty-state>
     } @else {
       <!-- Projects Grid -->
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -65,10 +56,19 @@
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
                 Créé {{ project.createdAt | date:'dd/MM/yyyy' }}
               </span>
-              <span class="flex items-center gap-1">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
-                {{ project.createdByUsername }}
-              </span>
+              <div class="flex items-center gap-2">
+                <span class="flex items-center gap-1">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+                  {{ project.createdByUsername }}
+                </span>
+                @if (project.createdByUserId === currentUser()?.id) {
+                  <button (click)="openDeleteModal($event, project)"
+                          class="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                          title="Supprimer le projet">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+                  </button>
+                }
+              </div>
             </div>
           </div>
         }
@@ -77,70 +77,63 @@
   }
 </div>
 
-<!-- Create Project Modal -->
+<!-- Create Project Modal avec composant réutilisable -->
 @if (showCreateModal()) {
-  <div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" (click)="closeCreateModal()">
-    <div class="bg-white rounded-2xl w-full max-w-md shadow-2xl" (click)="$event.stopPropagation()">
-      <!-- Modal Header -->
-      <div class="flex items-center justify-between p-6 border-b border-gray-100">
-        <h2 class="text-xl font-semibold text-gray-900">Nouveau Projet</h2>
-        <button (click)="closeCreateModal()" class="text-gray-400 hover:text-gray-600 transition-colors">
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
-        </button>
+  <app-modal title="Nouveau Projet" (close)="closeCreateModal()">
+    <form [formGroup]="projectForm" (ngSubmit)="createProject()" class="space-y-5">
+      <div>
+        <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Nom du projet *</label>
+        <input type="text" id="name" formControlName="name"
+               class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all outline-none"
+               [class.border-red-400]="projectForm.get('name')?.invalid && projectForm.get('name')?.touched"
+               placeholder="Mon super projet">
+        @if (projectForm.get('name')?.invalid && projectForm.get('name')?.touched) {
+          <p class="text-red-500 text-xs mt-1">Le nom est requis (2-100 caractères)</p>
+        }
       </div>
 
-      <!-- Modal Body -->
-      <form [formGroup]="projectForm" (ngSubmit)="createProject()" class="p-6 space-y-5">
-        <div>
-          <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Nom du projet *</label>
-          <input type="text" id="name" formControlName="name"
-                 class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all outline-none"
-                 [class.border-red-400]="projectForm.get('name')?.invalid && projectForm.get('name')?.touched"
-                 placeholder="Mon super projet">
-          @if (projectForm.get('name')?.invalid && projectForm.get('name')?.touched) {
-            <p class="text-red-500 text-xs mt-1">Le nom est requis (2-100 caractères)</p>
-          }
-        </div>
+      <div>
+        <label for="description" class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+        <textarea id="description" formControlName="description" rows="3"
+                  class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all outline-none resize-none"
+                  placeholder="Décrivez votre projet..."></textarea>
+      </div>
 
-        <div>
-          <label for="description" class="block text-sm font-medium text-gray-700 mb-1">Description</label>
-          <textarea id="description" formControlName="description" rows="3"
-                    class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all outline-none resize-none"
-                    placeholder="Décrivez votre projet..."></textarea>
-        </div>
-
-        <div>
-          <label for="startDate" class="block text-sm font-medium text-gray-700 mb-1">Date de début *</label>
-          <input type="date" id="startDate" formControlName="startDate"
-                 class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all outline-none"
-                 [class.border-red-400]="projectForm.get('startDate')?.invalid && projectForm.get('startDate')?.touched">
-          @if (projectForm.get('startDate')?.invalid && projectForm.get('startDate')?.touched) {
-            <p class="text-red-500 text-xs mt-1">La date de début est requise</p>
-          }
-        </div>
-
-        @if (createError()) {
-          <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
-            {{ createError() }}
-          </div>
+      <div>
+        <label for="startDate" class="block text-sm font-medium text-gray-700 mb-1">Date de début *</label>
+        <input type="date" id="startDate" formControlName="startDate"
+               class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all outline-none"
+               [class.border-red-400]="projectForm.get('startDate')?.invalid && projectForm.get('startDate')?.touched">
+        @if (projectForm.get('startDate')?.invalid && projectForm.get('startDate')?.touched) {
+          <p class="text-red-500 text-xs mt-1">La date de début est requise</p>
         }
+      </div>
 
-        <div class="flex gap-3 pt-2">
-          <button type="button" (click)="closeCreateModal()"
-                  class="flex-1 px-4 py-3 rounded-lg font-medium border border-gray-300 text-gray-700 hover:bg-gray-50 transition-all">
-            Annuler
-          </button>
-          <button type="submit"
-                  [disabled]="projectForm.invalid || isCreating()"
-                  class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-lg font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed">
-            @if (isCreating()) {
-              <span>Création...</span>
-            } @else {
-              <span>Créer le projet</span>
-            }
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
+      @if (createError()) {
+        <app-alert type="error" [message]="createError()!"></app-alert>
+      }
+
+      <div class="flex gap-3 pt-2">
+        <app-button type="button" variant="secondary" (click)="closeCreateModal()" class="flex-1">
+          Annuler
+        </app-button>
+        <app-button type="submit" [disabled]="projectForm.invalid" [loading]="isCreating()" class="flex-1">
+          Créer le projet
+        </app-button>
+      </div>
+    </form>
+  </app-modal>
+}
+
+<!-- Delete Confirmation Modal -->
+@if (showDeleteModal() && projectToDelete()) {
+  <app-confirm-modal
+    type="danger"
+    title="Supprimer le projet"
+    [message]="'Êtes-vous sûr de vouloir supprimer le projet \'' + projectToDelete()!.name + '\' ? Cette action est irréversible et supprimera toutes les tâches associées.'"
+    confirmLabel="Supprimer"
+    cancelLabel="Annuler"
+    (confirm)="confirmDeleteProject()"
+    (cancel)="closeDeleteModal()">
+  </app-confirm-modal>
 }

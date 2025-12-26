@@ -106,6 +106,13 @@
                       Terminé ✓
                     </button>
                   }
+                  @if (task.createdByUserId === currentUser()?.id) {
+                    <button (click)="openDeleteModal($event, task)"
+                            class="p-1 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                            title="Supprimer">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+                    </button>
+                  }
                 </div>
               </div>
             }
@@ -173,6 +180,19 @@
           </div>
         </div>
 
+        <!-- Assignee Selection -->
+        <div>
+          <label for="assignedToUserId" class="block text-sm font-medium text-gray-700 mb-1">Assigner à</label>
+          <select id="assignedToUserId" formControlName="assignedToUserId"
+                  class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all outline-none">
+            <option [value]="null">Non assigné</option>
+            @for (member of members(); track member.id) {
+              <option [value]="member.userId">{{ member.username }} ({{ member.email }})</option>
+            }
+          </select>
+          <p class="text-xs text-gray-500 mt-1">Optionnel - Vous pouvez assigner cette tâche à un membre du projet</p>
+        </div>
+
         @if (createError()) {
           <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
             {{ createError() }}
@@ -197,4 +217,17 @@
       </form>
     </div>
   </div>
+}
+
+<!-- Delete Task Confirmation Modal -->
+@if (showDeleteModal() && taskToDelete()) {
+  <app-confirm-modal
+    type="danger"
+    title="Supprimer la tâche"
+    [message]="'Êtes-vous sûr de vouloir supprimer la tâche \'' + taskToDelete()!.name + '\' ?'"
+    confirmLabel="Supprimer"
+    cancelLabel="Annuler"
+    (confirm)="confirmDeleteTask()"
+    (cancel)="closeDeleteModal()">
+  </app-confirm-modal>
 }
