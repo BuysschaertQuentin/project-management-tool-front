@@ -16,8 +16,8 @@ export interface Task {
   projectName: string;
   name: string;
   description: string;
-  status: TaskStatus;
-  priority: TaskPriority;
+  status: string;
+  priority: string;
   assignedToId?: number;
   assignedToUsername?: string;
   createdByUserId: number;
@@ -31,7 +31,7 @@ export interface Task {
 export interface TaskCreateRequest {
   name: string;
   description: string;
-  priority: TaskPriority;
+  priority: string;
   dueDate: string;
   createdByUserId: number;
 }
@@ -39,7 +39,7 @@ export interface TaskCreateRequest {
 export interface TaskUpdateRequest {
   name?: string;
   description?: string;
-  status?: TaskStatus;
-  priority?: TaskPriority;
+  status?: string;
+  priority?: string;
   dueDate?: string;
 }

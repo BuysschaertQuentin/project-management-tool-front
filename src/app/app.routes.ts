@@ -5,6 +5,7 @@ import { RegisterComponent } from './pages/auth/register/register.component';
 import { authGuard } from './core/guards/auth.guard';
 import { MainLayoutComponent } from './layout/main-layout/main-layout.component';
 import { DashboardComponent } from './pages/dashboard/dashboard.component';
+import { ProjectsComponent } from './pages/projects/projects.component';
 
 export const routes: Routes = [
   // Public Routes (Auth)
@@ -37,8 +38,13 @@ export const routes: Routes = [
       },
       {
         path: 'projects',
-        loadComponent: () => import('./pages/dashboard/dashboard.component').then(m => m.DashboardComponent), // Placeholder
-        title: 'Projets - PMT'
+        component: ProjectsComponent,
+        title: 'Mes Projets - PMT'
+      },
+      {
+        path: 'projects/:id',
+        loadComponent: () => import('./pages/project-detail/project-detail.component').then(m => m.ProjectDetailComponent),
+        title: 'Détail Projet - PMT'
       },
       {
         path: 'tasks',
