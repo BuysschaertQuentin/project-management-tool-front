@@ -18,7 +18,7 @@
 
 ### Pour lancer en local
 
-- **Node.js 18+** : [Télécharger ici](https://nodejs.org/)
+- **Node.js 24.13.0** : [Télécharger ici](https://nodejs.org/)
 - **npm** (inclus avec Node.js)
 - **Angular CLI** : `npm install -g @angular/cli`
 
