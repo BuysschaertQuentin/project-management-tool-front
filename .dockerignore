@@ -14,8 +14,8 @@ yarn-error.log*
 .DS_Store
 Thumbs.db
 
-# Build outputs
-dist/
+# Build outputs (dist/ is needed for Docker build)
+# dist/
 tmp/
 out-tsc/
 
