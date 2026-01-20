@@ -14,11 +14,11 @@ export class ErrorPageComponent implements OnInit {
   private router = inject(Router);
   private errorService = inject(ErrorService);
 
-  // Récupère le code d'erreur depuis l'URL ou l'historique du service
+  // Retrieves error code from URL or service history
   errorCode = signal<string>('');
   errorDetails = signal<AppError | null>(null);
 
-  // Messages par défaut si pas d'erreur spécifique
+  // Default messages if no specific error
   title = computed(() => {
     const details = this.errorDetails();
     if (details) return details.title;
@@ -43,11 +43,11 @@ export class ErrorPageComponent implements OnInit {
   });
 
   ngOnInit() {
-    // Récupérer le code depuis les query params
+    // Retrieve code from query params
     const code = this.route.snapshot.queryParamMap.get('code') || '500';
     this.errorCode.set(code);
 
-    // Récupérer les détails de la dernière erreur si disponibles
+    // Retrieve details of last error if available
     const history = this.errorService.errorHistory();
     if (history.length > 0) {
       const lastError = history[0];
